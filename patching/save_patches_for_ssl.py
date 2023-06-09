@@ -1,14 +1,7 @@
 import argparse
 import os
 import random
-import torch
-from openslide import open_slide
-from tqdm import tqdm
-import torchvision.transforms as transforms
-
-from yatt.MaskAndPatch import MaskAndPatch
-from yatt.tissue_mask import RgbTissueMasker
-from yatt.read_image import get_patch_at_mpp
+from yapssl_data.patch_and_download import _patch_and_download
 
 #########################################################
 # ARGUMENT PARSING
@@ -53,105 +46,85 @@ parser.add_argument('--patch_ext', default='.png', type=str,
 args = parser.parse_args()
 
 
+
+
+
+
 #########################################################
-# DEFINE PATCH AND DOWNLOAD FUNCTION FOR ONE WSI
+# PATCHING SCRIPT
 #########################################################
 
-def _patch_and_download(wsi_dir,
-                        wsi_name,
-                        save_destination,
-                        tag=''):
+if __name__ == '__main__':
 
-    wsi_fpath = os.path.join(wsi_dir, wsi_name)
-    root = os.path.splitext(os.path.basename(wsi_name))[0]
-    wsi = open_slide(wsi_fpath)
-    patcher = MaskAndPatch(mpp4mask=10,
-                           tissue_masker=RgbTissueMasker(),
-                           mpp4patch=args.mpp,
-                           patch_size=args.patch_size,
-                           store_mask=True
-                           )
+    if args.n_wsis is None:
 
-    patcher.fit_mask_and_patch_grid(wsi)
+        dir_lst = os.listdir(args.wsi_dir)
+        wsi_lst = [f for f in dir_lst if os.path.isfile(os.path.join(args.wsi_dir, f)) and f.endswith('.svs')]
 
-    patch_df = patcher.get_patch_df()
+        for i in range(len(wsi_lst)):
+            try:
+                filename = wsi_lst[i]
+                if os.path.isfile(os.path.join(args.wsi_dir, filename)):
+                    _patch_and_download(wsi_dir=args.wsi_dir,
+                                        wsi_name=filename,
+                                        save_destination=args.save_destination,
+                                        mpp=args.mpp,
+                                        patch_size=args.patch_size,
+                                        min_tissue_area=args.min_tissue_area,
+                                        max_num_patches_per_wsi=args.max_num_patches_per_wsi,
+                                        tag=' --- ' + str(i + 1) + '/' + str(args.n_wsis))
 
-    # Only include patches with enough tissue
+            except Exception:
+                print('Some WSI error occurred, continuing with new WSI')
+                pass
 
-    idxs_tissue = patch_df.query("tissue_area >= {}".
-                                 format(args.min_tissue_area)).index.values
-    patch_df['include'] = False
-    patch_df.loc[idxs_tissue, 'include'] = True
+            except ValueError:
+                print(
+                    f'A value error occurred. Most likely cause is that your specified file extention {args.patch_ext} is not supported. Supported file extension include .png and .pt')
+                break
 
-    # subset to only the patches we will include
-    patch_df_included = patch_df.query('include')
-    patch_coords = patch_df_included[['x', 'y']].values
+            except KeyboardInterrupt:
+                print('Interrupted by user.')
+                break
 
-    if args.max_num_patches_per_wsi is None:
-        total = len(patch_coords)
     else:
-        total = min(len(patch_coords), args.max_num_patches_per_wsi)
+        # Traverse through each file in the directory
+        dir_lst = os.listdir(args.wsi_dir)
 
-    for idx in tqdm(range(total), desc='Saving patches from --- ' + root + tag, position=1):
-        coords_level0 = patch_coords[idx]
+        wsi_lst = [f for f in dir_lst if os.path.isfile(os.path.join(args.wsi_dir, f)) and f.endswith('.svs')]
 
-        patch = get_patch_at_mpp(wsi=wsi,
-                                 mpp=args.mpp,
-                                 coords_level0=coords_level0,
-                                 patch_size_mpp=args.patch_size,
-                                 # tol=self.tol
-                                 )
+        already_tried = []
+        i = 0
+        while i < args.n_wsis:
+            try:
+                filename = random.choice(wsi_lst)
 
-        if args.patch_ext == '.pt':
-            to_tensor = transforms.ToTensor()
-            patch_tensor = to_tensor(patch)
+                while filename in already_tried:
+                    filename = random.choice(wsi_lst)
 
-            file_name = 'patch_' + str(idx) + '_' + root + args.patch_ext
-            file_path = os.path.join(save_destination, file_name)
-            torch.save(patch_tensor, file_path)
-        elif args.patch_ext == '.png':
-            file_name = 'patch_' + str(idx) + '_' + root + args.patch_ext
-            file_path = os.path.join(save_destination, file_name)
+                already_tried.append(filename)
 
-            patch.save(file_path)
-        else:
-            raise ValueError(f'Extension {args.patch_ext} not supported.')
+                if os.path.isfile(os.path.join(args.wsi_dir, filename)):
+                    _patch_and_download(wsi_dir=args.wsi_dir,
+                                        wsi_name=filename,
+                                        save_destination=args.save_destination,
+                                        mpp=args.mpp,
+                                        patch_size=args.patch_size,
+                                        min_tissue_area=args.min_tissue_area,
+                                        max_num_patches_per_wsi=args.max_num_patches_per_wsi,
+                                        tag=' --- ' + str(i + 1) + '/' + str(args.n_wsis))
+                    i += 1
 
 
-#########################################################
-# DEFINE PATCH AND DOWNLOAD FOR ONE WSI
-#########################################################
+            except Exception:
+                print('Some WSI error occurred, continuing with new WSI')
+                pass
 
-# Traverse through each file in the directory
-dir_lst = os.listdir(args.wsi_dir)
+            except ValueError:
+                print(
+                    f'A value error occurred. Most likely cause is that your specified file extention {args.patch_ext} is not supported. Supported file extension include .png and .pt')
+                break
 
-wsi_lst = [f for f in dir_lst if os.path.isfile(os.path.join(args.wsi_dir, f)) and f.endswith('.svs')]
-
-already_tried = []
-
-i = 0
-while i < args.n_wsis:
-    try:
-        filename = random.choice(wsi_lst)
-        while filename in already_tried:
-            filename = random.choice(wsi_lst)
-        already_tried.append(filename)
-
-        if os.path.isfile(os.path.join(args.wsi_dir, filename)):
-            _patch_and_download(wsi_dir=args.wsi_dir,
-                                wsi_name=filename,
-                                save_destination=args.save_destination,
-                                tag=' --- ' + str(i + 1) + '/' + str(args.n_wsis))
-            i += 1
-
-    except ValueError:
-        print(f'A value error occurred. Most likely cause is that your specified file extention {args.patch_ext} is not supported. Supported file extension include .png and .pt')
-        break
-
-    except Exception:
-        print('Some WSI error occurred, continuing with new WSI')
-        pass
-
-    except KeyboardInterrupt:
-        print('Interrupted by user.')
-        break
+            except KeyboardInterrupt:
+                print('Interrupted by user.')
+                break
