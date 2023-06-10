@@ -69,7 +69,7 @@ class SimCLR(pl.LightningModule):
 
         return {'val_loss': loss}
 
-    def on_validation_batch_end(self, outputs, batch, batch_idx):
+    def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx=None):
         self.log(name='val_loss',
                  value=outputs['val_loss'],
                  on_step=True,
