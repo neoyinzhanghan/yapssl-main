@@ -3,11 +3,8 @@ import torch
 import torchvision
 from torch import nn
 
-from lightly.data import LightlyDataset
-from lightly.data.multi_view_collate import MultiViewCollate
 from lightly.models import utils
 from lightly.models.modules import masked_autoencoder
-from lightly.transforms.mae_transform import MAETransform
 
 from torchmetrics import MetricCollection
 

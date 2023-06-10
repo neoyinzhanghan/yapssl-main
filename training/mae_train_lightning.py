@@ -5,11 +5,11 @@ import pytorch_lightning as pl
 from lightly.data.multi_view_collate import MultiViewCollate
 from torch.utils.data import DataLoader
 from lightly.data import LightlyDataset
-from lightly.transforms.simclr_transform import SimCLRTransform
 from yapssl_models.mae_lightning import MAE
 # from ssl_models.utils.grab_pt_patches import MySSLDataset
 from pytorch_lightning.callbacks import ModelCheckpoint
 from yaimpl.utils import parse_n_cpu
+from lightly.transforms.mae_transform import MAETransform
 
 
 
