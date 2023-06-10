@@ -1,0 +1,16 @@
+pytorch==2.0.1
+torchvision==0.13.1
+openslide==3.4.1
+openslide-python==1.2.0
+h5py==3.8.0
+opencv==4.5.5
+tqdm==4.65.0
+pandas==1.5.3
+numpy==1.24.3
+pillow==9.4.0
+more-itertools==9.1.0
+ray==2.4.0
+matplotlib==3.7.1
+scikit-image==0.21.0
+scikit-learn==1.2.2
+pyarrow==12.0.0
