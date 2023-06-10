@@ -98,12 +98,12 @@ if __name__ == '__main__':
                               drop_last=True,
                               num_workers=parse_n_cpu(args.num_workers))
 
-    test_loader = DataLoader(dataset_test,
-                             batch_size=args.test_batch_size,
-                             collate_fn=collate_fn,
-                             shuffle=False,
-                             drop_last=True,
-                             num_workers=parse_n_cpu(args.num_workers))
+    val_loader = DataLoader(dataset_test,
+                            batch_size=args.test_batch_size,
+                            collate_fn=collate_fn,
+                            shuffle=False,
+                            drop_last=True,
+                            num_workers=parse_n_cpu(args.num_workers))
 
 
     # MODEL SET-UP
@@ -125,4 +125,6 @@ if __name__ == '__main__':
                          accelerator=args.type_accelerator,
                          accumulate_grad_batches=args.accum_grad)
 
-    trainer.fit(autoencoder, train_loader, test_loader)
+    trainer.fit(autoencoder,
+                train_dataloader=train_loader,
+                val_dataloaders=val_loader)

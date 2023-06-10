@@ -44,7 +44,7 @@ class SimCLR(pl.LightningModule):
         z0 = self.forward(x0)
         z1 = self.forward(x1)
         loss = self.criterion(z0, z1)
-        
+
         return {'loss': loss}
 
     def on_train_batch_end(self, outputs, batch, batch_idx):
@@ -69,7 +69,7 @@ class SimCLR(pl.LightningModule):
 
         return {'val_loss': loss}
 
-    def on_test_batch_end(self, outputs, batch, batch_idx):
+    def on_validation_batch_end(self, outputs, batch, batch_idx):
         self.log(name='val_loss',
                  value=outputs['val_loss'],
                  on_step=True,

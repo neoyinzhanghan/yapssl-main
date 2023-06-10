@@ -100,12 +100,12 @@ if __name__ == '__main__':
                               drop_last=True,
                               num_workers=parse_n_cpu(args.num_workers))
 
-    test_loader = DataLoader(dataset_test,
-                             batch_size=args.test_batch_size,
-                             collate_fn=collate_fn,
-                             shuffle=False,
-                             drop_last=True,
-                             num_workers=parse_n_cpu(args.num_workers))
+    val_loader = DataLoader(dataset_test,
+                            batch_size=args.test_batch_size,
+                            collate_fn=collate_fn,
+                            shuffle=False,
+                            drop_last=True,
+                            num_workers=parse_n_cpu(args.num_workers))
     
     # MODEL
     model = MAE(lr=lr, warm_up_epochs=args.warm_up_epochs, total_epochs=args.epochs)
@@ -124,8 +124,7 @@ if __name__ == '__main__':
         accumulate_grad_batches=args.accum_grad
         )
 
-    trainer.fit(model=model, 
-                train_dataloaders=train_loader, 
-                val_dataloaders=test_loader,
-                )
+    trainer.fit(model,
+                train_dataloader=train_loader,
+                val_dataloaders=val_loader)
 
