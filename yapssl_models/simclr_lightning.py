@@ -75,9 +75,9 @@ class SimCLR(pl.LightningModule):
                  on_step=True,
                  on_epoch=True)
 
-        self.test_metrics.update()
+        self.val_metrics.update()
 
-        self.log_dict(self.test_metrics,
+        self.log_dict(self.val_metrics,
                       on_step=False,
                       on_epoch=True)
 

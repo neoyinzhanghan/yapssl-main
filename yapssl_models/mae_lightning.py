@@ -125,15 +125,15 @@ class MAE(pl.LightningModule):
 
         loss = self.criterion(x_pred, target)
 
-        return {'loss': loss}
+        return {'val_loss': loss}
     
     def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx=None):
         self.log(name='val_loss',
-                value=outputs['val_loss'],
-                on_step=True,
-                on_epoch=True)
+                 value=outputs['val_loss'],
+                 on_step=True,
+                 on_epoch=True)
 
-        self.test_metrics.update()
+        self.val_metrics.update()
 
         self.log_dict(self.test_metrics,
                     on_step=False,
