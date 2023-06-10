@@ -118,7 +118,6 @@ if __name__ == '__main__':
     # replace_sampler_ddp=True.
     trainer = pl.Trainer(
         max_epochs=10,
-        devices="auto",
         accelerator="gpu",
         callbacks=[checkpoint_callback],
         devices=args.num_accelerators,
