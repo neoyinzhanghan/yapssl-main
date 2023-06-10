@@ -124,7 +124,5 @@ if __name__ == '__main__':
         accumulate_grad_batches=args.accum_grad
         )
 
-    trainer.fit(model,
-                train_dataloader=train_loader,
-                val_dataloaders=val_loader)
+    trainer.fit(model, train_loader, val_loader)
 

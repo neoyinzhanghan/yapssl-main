@@ -125,6 +125,5 @@ if __name__ == '__main__':
                          accelerator=args.type_accelerator,
                          accumulate_grad_batches=args.accum_grad)
 
-    trainer.fit(autoencoder,
-                train_dataloader=train_loader,
-                val_dataloaders=val_loader)
+    trainer.fit(autoencoder, train_loader, val_loader)
+
