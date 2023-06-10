@@ -117,7 +117,7 @@ if __name__ == '__main__':
     # Train with DDP on multiple gpus. Distributed sampling is also enabled with
     # replace_sampler_ddp=True.
     trainer = pl.Trainer(
-        max_epochs=10,
+        max_epochs=args.epochs,
         callbacks=[checkpoint_callback],
         devices=args.num_accelerators,
         accelerator=args.type_accelerator,
