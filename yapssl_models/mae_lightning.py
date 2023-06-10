@@ -9,22 +9,34 @@ from lightly.models import utils
 from lightly.models.modules import masked_autoencoder
 from lightly.transforms.mae_transform import MAETransform
 
+from torchmetrics import MetricCollection
+
+from yapssl_utils.warm_up_epochs import WarmUpLR
 
 class MAE(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, 
+                 lr,
+                 mask_ratio=0.75,
+                 decoder_dim=512,
+                 decoder_num_layers=1,
+                 decoder_num_heads=16,
+                 warm_up_epochs=10,
+                 total_epochs=100,
+                 ):
+        
         super().__init__()
 
-        decoder_dim = 512
+        self.decoder_dim = decoder_dim
         vit = torchvision.models.vit_b_32(pretrained=False)
-        self.mask_ratio = 0.75
+        self.mask_ratio = mask_ratio
         self.patch_size = vit.patch_size
         self.sequence_length = vit.seq_length
         self.mask_token = nn.Parameter(torch.zeros(1, 1, decoder_dim))
         self.backbone = masked_autoencoder.MAEBackbone.from_vit(vit)
         self.decoder = masked_autoencoder.MAEDecoder(
             seq_length=vit.seq_length,
-            num_layers=1,
-            num_heads=16,
+            num_layers=decoder_num_layers,
+            num_heads=decoder_num_heads,
             embed_input_dim=vit.hidden_dim,
             hidden_dim=decoder_dim,
             mlp_dim=decoder_dim * 4,
@@ -33,6 +45,14 @@ class MAE(pl.LightningModule):
             attention_dropout=0,
         )
         self.criterion = nn.MSELoss()
+        self.warm_up_epochs = warm_up_epochs
+        self.total_epochs = total_epochs
+        self.lr = lr
+
+        metrics_dict = {}
+        metrics = MetricCollection(metrics_dict)
+        self.train_metrics = metrics.clone(prefix='train_')
+        self.val_metrics = metrics.clone(prefix='val_')
 
     def forward_encoder(self, images, idx_keep=None):
         return self.backbone.encode(images, idx_keep)
@@ -72,42 +92,62 @@ class MAE(pl.LightningModule):
         target = utils.get_at_index(patches, idx_mask - 1)
 
         loss = self.criterion(x_pred, target)
-        return loss
+
+        return {'loss': loss}
+    
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+
+        self.log(name='train_loss',
+                 value=outputs['loss'],
+                 on_step=True,
+                 on_epoch=True)
+
+        self.train_metrics.update()
+
+        self.log_dict(self.train_metrics,
+                      on_step=False,
+                      on_epoch=True)
+
+    def validation_step(self, batch, batch_idx):
+        images, _, _ = batch
+        images = images[0]
+        batch_size = images.shape[0]
+        idx_keep, idx_mask = utils.random_token_mask(
+            size=(batch_size, self.sequence_length),
+            mask_ratio=self.mask_ratio,
+            device=images.device,
+        )
+
+        x_encoded = self.forward_encoder(images, idx_keep)
+        x_pred = self.forward_decoder(x_encoded, idx_keep, idx_mask)
+
+        # get image patches for masked tokens
+        patches = utils.patchify(images, self.patch_size)
+        # must adjust idx_mask for missing class token
+        target = utils.get_at_index(patches, idx_mask - 1)
+
+        loss = self.criterion(x_pred, target)
+
+        return {'loss': loss}
+    
+    def on_test_batch_end(self, outputs, batch, batch_idx):
+        self.log(name='val_loss',
+                value=outputs['val_loss'],
+                on_step=True,
+                on_epoch=True)
+
+        self.test_metrics.update()
+
+        self.log_dict(self.test_metrics,
+                    on_step=False,
+                    on_epoch=True)
 
     def configure_optimizers(self):
-        optim = torch.optim.AdamW(self.parameters(), lr=1.5e-4)
-        return optim
+        optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
+        scheduler = WarmUpLR(optimizer=optimizer,
+                             warm_up_epochs=self.warm_up_epochs,
+                             total_epochs=self.total_epochs)
 
-
-model = MAE()
-
-# we ignore object detection annotations by setting target_transform to return 0
-pascal_voc = torchvision.datasets.VOCDetection(
-    "datasets/pascal_voc", download=True, target_transform=lambda t: 0
-)
-transform = MAETransform()
-dataset = LightlyDataset.from_torch_dataset(pascal_voc, transform=transform)
-# or create a dataset from a folder containing images or videos:
-# dataset = LightlyDataset("path/to/folder")
-
-collate_fn = MultiViewCollate()
-
-dataloader = torch.utils.data.DataLoader(
-    dataset,
-    batch_size=256,
-    collate_fn=collate_fn,
-    shuffle=True,
-    drop_last=True,
-    num_workers=8,
-)
-
-# Train with DDP on multiple gpus. Distributed sampling is also enabled with
-# replace_sampler_ddp=True.
-trainer = pl.Trainer(
-    max_epochs=10,
-    devices="auto",
-    accelerator="gpu",
-    strategy="ddp",
-    use_distributed_sampler=True,  # or replace_sampler_ddp=True for PyTorch Lightning <2.0
-)
-trainer.fit(model=model, train_dataloaders=dataloader)
+        return {'optimizer': optimizer,
+                'lr_scheduler': scheduler,
+                'monitor': 'train_loss'}

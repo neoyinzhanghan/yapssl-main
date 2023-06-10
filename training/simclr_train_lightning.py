@@ -22,17 +22,17 @@ parser = argparse.ArgumentParser()
 group = parser.add_argument_group('File paths')
 ####################################
 
-group.add_argument('--data_path', default='~/Documents/neo/diverse_lusc_patches', type=str,
+group.add_argument('--data_path', type=str,
                    help='folder containing train and test data. Must structured as /data_path/train/label/')
 
 ####################################
 group = parser.add_argument_group('Training Hyperparameters')
 ####################################
 
-parser.add_argument('--batch_size', default=64, type=int, #4096 is the paper default but yeah... cuda out of memory
-                    help='Batch size... duh...')
+parser.add_argument('--batch_size', default=64, type=int, #4096 is the paper default eff_batch_size
+                    help='Batch size for training')
 parser.add_argument('--test_batch_size', default=64, type=int,
-                    help='Batch size... duh...')
+                    help='Batch size for testing')
 parser.add_argument('--epochs', default=100, type=int,
                     help='total number of epochs during training')
 parser.add_argument('--blr', default=0.3, type=float,
@@ -85,11 +85,11 @@ if __name__ == '__main__':
     # DATA TRANSFORMATION
     collate_fn = MultiViewCollate()
 
-    transform_train = SimCLRTransform(input_size=224)
+    transform = SimCLRTransform(input_size=224)
 
     # DATASET CONFIGURATION
-    dataset_train = LightlyDataset(os.path.join(os.path.expanduser(args.data_path),'train'), transform=transform_train)
-    dataset_test = LightlyDataset(os.path.join(os.path.expanduser(args.data_path),'test'), transform=transform_train)
+    dataset_train = LightlyDataset(os.path.join(os.path.expanduser(args.data_path),'train'), transform=transform)
+    dataset_test = LightlyDataset(os.path.join(os.path.expanduser(args.data_path),'test'), transform=transform)
 
     train_loader = DataLoader(dataset_train,
                               batch_size=args.batch_size,
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
 
     # CHECKPOINT CALLBACK SETTING
-    checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='train_loss', mode='min')
+    checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='val_loss', mode='min')
 
 
     # LIGHTNING TRAINER SETTING
