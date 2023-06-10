@@ -2,7 +2,8 @@ import torch.nn as nn
 import functools
 
 # from ssl_models.ssl_model_mae import mae_lightning as mae
-from ssl_models import simclr_lightning as simclr
+from yapssl_models import simclr_lightning as simclr
+from yapssl_models import mae_lightning as mae
 
 class PatchFeatureExtractor(nn.Module):
     """ Prepare a pretrained SSL model for patch feature extraction
@@ -28,6 +29,10 @@ class PatchFeatureExtractor(nn.Module):
             extraction_model = simclr.SimCLRLightning.load_from_checkpoint(chkpt_fpath)
             extraction_model.eval()
 
+        if self.ssl_arch == 'mae':
+            extraction_model = mae.MAELightning.load_from_checkpoint(chkpt_fpath)
+            extraction_model.eval()
+
         self.chkpt = extraction_model
 
 
@@ -43,6 +48,11 @@ class PatchFeatureExtractor(nn.Module):
             encoder_output = self.chkpt.backbone(x)
             batch_size = encoder_output.size(0)
             latent_feature = encoder_output.reshape(batch_size, -1) # flatten the simclr output
+        
+        if self.ssl_arch == 'mae':
+            encoder_output, _, _ = self.chkpt.mae.forward_encoder(x, mask_ratio=self.chkpt.mask_ratio)
+            batch_size = encoder_output.size(0)
+            latent_feature = encoder_output.reshape(batch_size, -1) # flatten the mae output
 
         return latent_feature
 
