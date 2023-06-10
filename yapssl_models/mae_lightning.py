@@ -135,9 +135,9 @@ class MAE(pl.LightningModule):
 
         self.val_metrics.update()
 
-        self.log_dict(self.test_metrics,
-                    on_step=False,
-                    on_epoch=True)
+        self.log_dict(self.val_metrics,
+                     on_step=False,
+                     on_epoch=True)
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
