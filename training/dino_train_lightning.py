@@ -149,6 +149,6 @@ if __name__ == '__main__':
         accelerator="gpu",
         strategy="ddp",
         sync_batchnorm=True,
-        use_distributed_sampler=True,  # or replace_sampler_ddp=True for PyTorch Lightning <2.0
+        replace_sampler_ddp=True
     )
     trainer.fit(model, train_loader, val_loader)
