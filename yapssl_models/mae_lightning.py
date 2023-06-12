@@ -135,7 +135,7 @@ class MAE(pl.LightningModule):
                  on_step=True,
                  on_epoch=True,
                  sync_dist=True,
-                 batch_size=batch[0].shape[0])
+                 batch_size=self.batch_size)
 
         self.val_metrics.update()
 
