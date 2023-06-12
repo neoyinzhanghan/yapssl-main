@@ -91,13 +91,7 @@ class DINO(pl.LightningModule):
         momentum = cosine_schedule(self.current_epoch, 10, 0.996, 1)
         update_momentum(self.student_backbone, self.teacher_backbone, m=momentum)
         update_momentum(self.student_head, self.teacher_head, m=momentum)
-        # print(batch[0]) # for debugging purposes TODO remove
-        # # get the shape of the batch
-        # print(batch[0][1].shape) # for debugging purposes TODO remove
-        # # print(len(batch[1])) # for debugging purposes TODO remove
-        print(type(batch)) # for debugging purposes TODO remove
-        print(len(batch)) # for debugging purposes TODO remove
-        views, _ = batch
+        views, _, _ = batch
         views = [view.to(self.device) for view in views]
         global_views = views[:2]
         teacher_out = [self.forward_teacher(view) for view in global_views]
@@ -120,31 +114,31 @@ class DINO(pl.LightningModule):
                       on_epoch=True)
 
 
-    # def validation_step(self, batch, batch_idx):
-    #     momentum = cosine_schedule(self.current_epoch, 10, 0.996, 1)
-    #     update_momentum(self.student_backbone, self.teacher_backbone, m=momentum)
-    #     update_momentum(self.student_head, self.teacher_head, m=momentum)
-    #     views, _ = batch
-    #     views = [view.to(self.device) for view in views]
-    #     global_views = views[:2]
-    #     teacher_out = [self.forward_teacher(view) for view in global_views]
-    #     student_out = [self.forward(view) for view in views]
-    #     loss = self.criterion(teacher_out, student_out, epoch=self.current_epoch)
+    def validation_step(self, batch, batch_idx):
+        momentum = cosine_schedule(self.current_epoch, 10, 0.996, 1)
+        update_momentum(self.student_backbone, self.teacher_backbone, m=momentum)
+        update_momentum(self.student_head, self.teacher_head, m=momentum)
+        views, _, _ = batch
+        views = [view.to(self.device) for view in views]
+        global_views = views[:2]
+        teacher_out = [self.forward_teacher(view) for view in global_views]
+        student_out = [self.forward(view) for view in views]
+        loss = self.criterion(teacher_out, student_out, epoch=self.current_epoch)
 
-    #     return {'val_loss': loss}
+        return {'val_loss': loss}
 
 
-    # def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx):
-    #     self.log(name='val_loss',
-    #              value=outputs['val_loss'],
-    #              on_step=True,
-    #              on_epoch=True)
+    def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx):
+        self.log(name='val_loss',
+                 value=outputs['val_loss'],
+                 on_step=True,
+                 on_epoch=True)
 
-    #     self.train_metrics.update()
+        self.train_metrics.update()
 
-    #     self.log_dict(self.train_metrics,
-    #                   on_step=False,
-    #                   on_epoch=True)
+        self.log_dict(self.train_metrics,
+                      on_step=False,
+                      on_epoch=True)
         
     def on_after_backward(self):
         self.student_head.cancel_last_layer_gradients(current_epoch=self.current_epoch)
