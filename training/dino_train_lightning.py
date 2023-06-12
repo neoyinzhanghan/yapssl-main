@@ -133,7 +133,7 @@ if __name__ == '__main__':
                  sub_patch_size=args.sub_patch_size,)
 
     # CHECKPOINT CALLBACK SETTING
-    checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='train_loss', mode='min')
+    checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='val_loss', mode='min')
 
     transform = DINOTransform()
 
