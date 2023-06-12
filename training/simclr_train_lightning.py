@@ -114,7 +114,8 @@ if __name__ == '__main__':
     autoencoder = SimCLR(lr=lr,
                          warm_up_epochs=args.warm_up_epochs,
                          total_epochs=args.epochs,
-                         weight_decay=args.weight_decay)
+                         weight_decay=args.weight_decay,
+                         batch_size=args.batch_size)
 
 
     # CHECKPOINT CALLBACK SETTING

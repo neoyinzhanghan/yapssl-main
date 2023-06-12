@@ -22,6 +22,7 @@ class DINO(pl.LightningModule):
                  min_lr,
                  epochs,
                  niter_per_ep,
+                 batch_size,
                  lr_warm_up_epochs = 10,
                  sub_patch_size = 8,
                  temp_student = 0.1,
@@ -62,6 +63,7 @@ class DINO(pl.LightningModule):
         self.temp_teacher_end = temp_teacher_end
         self.temp_teacher_warm_up_epochs = temp_teacher_warm_up_epochs
         self.weight_decay = weight_decay
+        self.batch_size = batch_size
 
         self.criterion = DINOLoss(output_dim=2048, 
                                   warmup_teacher_temp_epochs=self.temp_teacher_warm_up_epochs,

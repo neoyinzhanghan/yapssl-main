@@ -12,7 +12,7 @@ from yapssl_utils.warm_up_epochs import WarmUpLR
 # Implement the warm-up epochs
 
 class SimCLR(pl.LightningModule):
-    def __init__(self, lr, warm_up_epochs, total_epochs, weight_decay):
+    def __init__(self, lr, warm_up_epochs, total_epochs, weight_decay, batch_size):
 
         super().__init__()
         resnet = torchvision.models.resnet50()
@@ -22,6 +22,7 @@ class SimCLR(pl.LightningModule):
         self.warm_up_epochs = warm_up_epochs
         self.total_epochs = total_epochs
         self.weight_decay = weight_decay
+        self.batch_size = batch_size
 
         # enable gather_distributed to gather features from all gpus
         # before calculating the loss

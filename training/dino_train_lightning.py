@@ -130,7 +130,8 @@ if __name__ == '__main__':
                  min_lr=args.min_lr, 
                  epochs=args.epochs, 
                  niter_per_ep=len(train_loader), 
-                 sub_patch_size=args.sub_patch_size,)
+                 batch_size=args.batch_size,
+                 sub_patch_size=args.sub_patch_size)
 
     # CHECKPOINT CALLBACK SETTING
     checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='val_loss', mode='min')

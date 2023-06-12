@@ -13,6 +13,7 @@ from yapssl_utils.warm_up_epochs import WarmUpLR
 class MAE(pl.LightningModule):
     def __init__(self, 
                  lr,
+                 batch_size,
                  mask_ratio=0.75,
                  decoder_dim=512,
                  decoder_num_layers=1,
@@ -45,6 +46,7 @@ class MAE(pl.LightningModule):
         self.warm_up_epochs = warm_up_epochs
         self.total_epochs = total_epochs
         self.lr = lr
+        self.batch_size = batch_size
 
         metrics_dict = {}
         metrics = MetricCollection(metrics_dict)

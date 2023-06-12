@@ -117,7 +117,7 @@ if __name__ == '__main__':
                             num_workers=parse_n_cpu(args.num_workers))
     
     # MODEL
-    model = MAE(lr=lr, warm_up_epochs=args.warm_up_epochs, total_epochs=args.epochs)
+    model = MAE(lr=lr, batch_size=args.batch_size, warm_up_epochs=args.warm_up_epochs, total_epochs=args.epochs)
 
     # CHECKPOINT CALLBACK SETTING
     checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='val_loss', mode='min')
