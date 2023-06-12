@@ -1,5 +1,6 @@
 import os
 import argparse
+import torch
 
 import pytorch_lightning as pl
 
@@ -94,6 +95,9 @@ if __name__ == '__main__':
     ############################
     ### MAIN TRAINING SCRIPT ###
     ############################
+
+    # Set torch global precision
+    torch.set_float32_matmul_precision('medium' | 'high')
 
     # LEARNING RATE COMPUTATION
 

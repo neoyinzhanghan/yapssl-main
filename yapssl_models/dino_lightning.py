@@ -112,6 +112,7 @@ class DINO(pl.LightningModule):
 
 
     def validation_step(self, batch, batch_idx):
+
         momentum = cosine_schedule(self.current_epoch, 10, 0.996, 1)
         update_momentum(self.student_backbone, self.teacher_backbone, m=momentum)
         update_momentum(self.student_head, self.teacher_head, m=momentum)
@@ -126,6 +127,7 @@ class DINO(pl.LightningModule):
 
 
     def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx):
+        
         self.log(name='val_loss',
                  value=outputs['val_loss'],
                  on_step=True,
