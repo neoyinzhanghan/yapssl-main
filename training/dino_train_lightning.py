@@ -14,7 +14,7 @@ from yapssl_models.dino_lightning import DINO
 from pytorch_lightning.callbacks import ModelCheckpoint
 from yaimpl.utils import parse_n_cpu
 
-from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.strategies import DDPStrategy
 
 
 
@@ -143,6 +143,6 @@ if __name__ == '__main__':
         strategy="ddp",
         sync_batchnorm=True,
         replace_sampler_ddp=True,
-        plugins=DDPPlugin(find_unused_parameters=False)
+        strategy=DDPStrategy(find_unused_parameters=False)
     )
     trainer.fit(model, train_loader, val_loader)
