@@ -98,12 +98,12 @@ class DINO(pl.LightningModule):
         student_out = [self.forward(view) for view in views]
         loss = self.criterion(teacher_out, student_out, epoch=self.current_epoch)
 
-        return {'train_loss': loss}
+        return {'loss': loss}
 
     def on_training_batch_end(self, outputs, batch, batch_idx, dataloader_idx):
 
         self.log(name='train_loss',
-                 value=outputs['train_loss'],
+                 value=outputs['loss'],
                  on_step=True,
                  on_epoch=True)
 

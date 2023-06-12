@@ -45,12 +45,12 @@ class SimCLR(pl.LightningModule):
         z1 = self.forward(x1)
         loss = self.criterion(z0, z1)
 
-        return {'train_loss': loss}
+        return {'loss': loss}
 
     def on_train_batch_end(self, outputs, batch, batch_idx, dataloader_idx=None):
 
         self.log(name='train_loss',
-                 value=outputs['train_loss'],
+                 value=outputs['loss'],
                  on_step=True,
                  on_epoch=True)
 
