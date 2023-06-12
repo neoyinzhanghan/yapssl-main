@@ -12,6 +12,7 @@ from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.transforms.dino_transform import DINOTransform
 from lightly.utils.scheduler import cosine_schedule
 from torchmetrics import MetricCollection
+from lightly.data import LightlyDataset, LightlyDataModule
 
 
 
