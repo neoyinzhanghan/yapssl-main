@@ -140,9 +140,8 @@ if __name__ == '__main__':
         devices=args.num_accelerators,
         callbacks=[checkpoint_callback],
         accelerator="gpu",
-        strategy="ddp",
+        strategy=DDPStrategy(find_unused_parameters=False),
         sync_batchnorm=True,
         replace_sampler_ddp=True,
-        strategy=DDPStrategy(find_unused_parameters=False)
     )
     trainer.fit(model, train_loader, val_loader)
