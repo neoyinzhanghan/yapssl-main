@@ -19,7 +19,7 @@ from torchmetrics import MetricCollection
 ### ARGUMENT PARSING ###
 ########################
 
-arser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 
 ####################################
 group = parser.add_argument_group('File paths')
