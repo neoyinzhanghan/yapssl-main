@@ -143,7 +143,7 @@ if __name__ == '__main__':
     # Train with DDP and use Synchronized Batch Norm for a more accurate batch norm
     # calculation. Distributed sampling is also enabled with replace_sampler_ddp=True.
     trainer = pl.Trainer(
-        max_epochs=args.epoch,
+        max_epochs=args.epochs,
         devices=args.num_accelerators,
         callbacks=[checkpoint_callback],
         accelerator="gpu",
