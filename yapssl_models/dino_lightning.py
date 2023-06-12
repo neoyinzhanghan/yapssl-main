@@ -16,7 +16,8 @@ from lightly.transforms.dino_transform import DINOTransform
 from lightly.utils.scheduler import cosine_schedule
 from torchmetrics import MetricCollection
 
-from yapssl_utils.cosine_schedulers import CosineScheduler, AdamWCosineWD
+from yapssl_utils.cosine_schedulers import CosineScheduler
+from torch.optim import AdamW
 
 class DINO(pl.LightningModule):
     def __init__(self,
@@ -30,8 +31,8 @@ class DINO(pl.LightningModule):
                  temp_teacher_start = 0.04, # cosine schedule from 0.04 to 0.07 over the first 30 epochs
                  temp_teacher_end = 0.07,
                  temp_teacher_warm_up_epochs =30,
-                 weight_decay_start = 0.04, # cosine schedule from 0.04 to 0.4
-                 weight_decay_end = 0.4):
+                 weight_decay=(0.04 + 0.4)/2):
+        
         super().__init__()
 
         # this is if you want to use resnet18 backbone
@@ -63,8 +64,7 @@ class DINO(pl.LightningModule):
         self.temp_teacher_start = temp_teacher_start
         self.temp_teacher_end = temp_teacher_end
         self.temp_teacher_warm_up_epochs = temp_teacher_warm_up_epochs
-        self.weight_decay_start = weight_decay_start
-        self.weight_decay_end = weight_decay_end
+        self.weight_decay = weight_decay
 
         self.criterion = DINOLoss(output_dim=2048, 
                                   warmup_teacher_temp_epochs=self.temp_teacher_warm_up_epochs,
@@ -144,12 +144,9 @@ class DINO(pl.LightningModule):
         self.student_head.cancel_last_layer_gradients(current_epoch=self.current_epoch)
 
     def configure_optimizers(self):
-        optimizer = AdamWCosineWD(self.parameters(),
-                                  lr=self.lr,
-                                  base_value=self.weight_decay_start,
-                                  final_value=self.weight_decay_end,
-                                  epochs=self.epochs,
-                                  niter_per_ep=self.niter_per_ep)
+        optimizer = AdamW(self.parameters(),
+                          lr=self.lr,
+                          weight_decay=self.weight_decay)
 
         scheduler = CosineScheduler(optimizer, 
                                     base_value=self.lr, 
