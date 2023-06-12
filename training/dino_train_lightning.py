@@ -2,27 +2,20 @@ import os
 import argparse
 
 import pytorch_lightning as pl
-import torch
-import torchvision
-from torch import nn
 
-from lightly.loss import DINOLoss
-from lightly.models.modules import DINOProjectionHead
-from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.transforms.dino_transform import DINOTransform
-from lightly.utils.scheduler import cosine_schedule
-from torchmetrics import MetricCollection
 from lightly.data import LightlyDataset
 
 import pytorch_lightning as pl
-from lightly.data.multi_view_collate import MultiViewCollate
 from torch.utils.data import DataLoader
 from lightly.data import LightlyDataset
-from lightly.transforms.simclr_transform import SimCLRTransform
 from yapssl_models.dino_lightning import DINO
 # from ssl_models.utils.grab_pt_patches import MySSLDataset
 from pytorch_lightning.callbacks import ModelCheckpoint
 from yaimpl.utils import parse_n_cpu
+
+from pytorch_lightning.plugins import DDPPlugin
+
 
 
 ########################
@@ -149,6 +142,7 @@ if __name__ == '__main__':
         accelerator="gpu",
         strategy="ddp",
         sync_batchnorm=True,
-        replace_sampler_ddp=True
+        replace_sampler_ddp=True,
+        plugins=DDPPlugin(find_unused_parameters=False)
     )
     trainer.fit(model, train_loader, val_loader)
