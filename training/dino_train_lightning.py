@@ -97,7 +97,7 @@ if __name__ == '__main__':
     ############################
 
     # Set torch global precision
-    torch.set_float32_matmul_precision('medium' | 'high')
+    torch.set_float32_matmul_precision('medium')
 
     # LEARNING RATE COMPUTATION
 
