@@ -133,7 +133,7 @@ if __name__ == '__main__':
         devices=args.num_accelerators,
         accelerator=args.type_accelerator,
         accumulate_grad_batches=args.accum_grad,
-        log_every_n_steps=10)
+        log_every_n_steps=1)
 
     trainer.fit(model, train_loader, val_loader)
 

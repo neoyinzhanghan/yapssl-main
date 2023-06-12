@@ -149,6 +149,6 @@ if __name__ == '__main__':
         sync_batchnorm=True,
         replace_sampler_ddp=True,
         accumulate_grad_batches=args.accum_grad,
-        log_every_n_steps=10,
+        log_every_n_steps=1,
     )
     trainer.fit(model, train_loader, val_loader)
