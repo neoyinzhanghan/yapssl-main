@@ -129,7 +129,8 @@ if __name__ == '__main__':
                          accelerator="gpu",
                          devices=args.num_accelerators,
                          accelerator=args.type_accelerator,
-                         accumulate_grad_batches=args.accum_grad)
+                         accumulate_grad_batches=args.accum_grad,
+                         log_every_n_steps=10,)
 
     trainer.fit(autoencoder, train_loader, val_loader)
 

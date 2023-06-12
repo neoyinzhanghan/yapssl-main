@@ -102,7 +102,9 @@ class DINO(pl.LightningModule):
         self.log(name='train_loss',
                  value=outputs['loss'],
                  on_step=True,
-                 on_epoch=True)
+                 on_epoch=True,
+                 sync_dist=True,
+                 batch_size=batch[0].shape[0])
 
         self.train_metrics.update()
 
@@ -131,7 +133,9 @@ class DINO(pl.LightningModule):
         self.log(name='val_loss',
                  value=outputs['val_loss'],
                  on_step=True,
-                 on_epoch=True)
+                 on_epoch=True,
+                 sync_dist=True,
+                 batch_size=batch[0].shape[0])
 
         self.train_metrics.update()
 

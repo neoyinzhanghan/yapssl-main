@@ -147,5 +147,7 @@ if __name__ == '__main__':
         strategy=DDPStrategy(find_unused_parameters=False),
         sync_batchnorm=True,
         replace_sampler_ddp=True,
+        accumulate_grad_batches=args.accum_grad,
+        log_every_n_steps=10,
     )
     trainer.fit(model, train_loader, val_loader)
