@@ -29,28 +29,28 @@ group.add_argument('--data_path', type=str,
 group = parser.add_argument_group('Training Hyperparameters')
 ####################################
 
-parser.add_argument('--batch_size', default=64, type=int, #4096 is the paper default eff_batch_size
+group.add_argument('--batch_size', default=64, type=int, #4096 is the paper default eff_batch_size
                     help='Batch size for training')
-parser.add_argument('--test_batch_size', default=64, type=int,
+group.add_argument('--test_batch_size', default=64, type=int,
                     help='Batch size for testing')
-parser.add_argument('--epochs', default=100, type=int,
+group.add_argument('--epochs', default=100, type=int,
                     help='total number of epochs during training')
-parser.add_argument('--blr', default=0.3, type=float,
+group.add_argument('--blr', default=0.3, type=float,
                     help='this base learning rate is used to compute the actual learning rate')
-parser.add_argument('--max_num_batches', default=None, type=int,
+group.add_argument('--max_num_batches', default=None, type=int,
                     help='the maximum number of batches per epoch')
-parser.add_argument('--weight_decay', default=10**(-6), type=float,
+group.add_argument('--weight_decay', default=10**(-6), type=float,
                     help='In deep learning, weight decay is a regularization technique used to prevent overfitting by adding a penalty to the loss function, which effectively reduces the magnitude of the weights in the model.')
-parser.add_argument('--warm_up_epochs', default=10, type=int,
+group.add_argument('--warm_up_epochs', default=10, type=int,
                     help='the number of epochs for a linear training warm-up')
-parser.add_argument('--accum_grad', default=1, type=int,
+group.add_argument('--accum_grad', default=1, type=int,
                     help='accumulate gradients for accum_grad batches')
 
 ####################################
 group = parser.add_argument_group('Hardwares Configuration')
 ####################################
 
-parser.add_argument('--num_workers', default=1, type=int,
+group.add_argument('--num_workers', default=1, type=int,
                     help='the number of workers in parsing batches')
 group.add_argument('--num_accelerators', default=1, type=int,
                     help='the number of accelerators in distributed training')
