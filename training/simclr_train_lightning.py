@@ -121,6 +121,8 @@ if __name__ == '__main__':
     trainer = pl.Trainer(max_epochs=args.epochs,
                          limit_train_batches=args.max_num_batches,
                          callbacks=[checkpoint_callback],
+                         strategy="ddp",
+                         accelerator="gpu",
                          devices=args.num_accelerators,
                          accelerator=args.type_accelerator,
                          accumulate_grad_batches=args.accum_grad)

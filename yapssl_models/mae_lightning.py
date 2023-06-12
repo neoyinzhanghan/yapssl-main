@@ -90,12 +90,12 @@ class MAE(pl.LightningModule):
 
         loss = self.criterion(x_pred, target)
 
-        return {'loss': loss}
+        return {'train_loss': loss}
     
-    def on_train_batch_end(self, outputs, batch, batch_idx):
+    def on_train_batch_end(self, outputs, batch, batch_idx, dataloader_idx=None):
 
         self.log(name='train_loss',
-                 value=outputs['loss'],
+                 value=outputs['train_loss'],
                  on_step=True,
                  on_epoch=True)
 
