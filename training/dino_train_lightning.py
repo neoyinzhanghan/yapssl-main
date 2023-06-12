@@ -139,23 +139,6 @@ if __name__ == '__main__':
     checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='val_loss', mode='min')
 
     transform = DINOTransform()
-    # we ignore object detection annotations by setting target_transform to return 0
-    dataset = torchvision.datasets.VOCDetection(
-        "datasets/pascal_voc",
-        download=True,
-        transform=transform,
-        target_transform=lambda t: 0,
-    )
-    # or create a dataset from a folder containing images or videos:
-    # dataset = LightlyDataset("path/to/folder")
-
-    dataloader = torch.utils.data.DataLoader(
-        dataset,
-        batch_size=64,
-        shuffle=True,
-        drop_last=True,
-        num_workers=8,
-    )
 
     # Train with DDP and use Synchronized Batch Norm for a more accurate batch norm
     # calculation. Distributed sampling is also enabled with replace_sampler_ddp=True.
@@ -168,4 +151,4 @@ if __name__ == '__main__':
         sync_batchnorm=True,
         use_distributed_sampler=True,  # or replace_sampler_ddp=True for PyTorch Lightning <2.0
     )
-    trainer.fit(model=model, train_dataloaders=dataloader)
+    trainer.fit(model, train_loader, val_loader)
