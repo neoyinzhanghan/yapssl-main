@@ -19,7 +19,7 @@ from lightly.data.multi_view_collate import MultiViewCollate
 from torch.utils.data import DataLoader
 from lightly.data import LightlyDataset
 from lightly.transforms.simclr_transform import SimCLRTransform
-from yapssl_models.simclr_lightning import SimCLR
+from yapssl_models.dino_lightning import DINO
 # from ssl_models.utils.grab_pt_patches import MySSLDataset
 from pytorch_lightning.callbacks import ModelCheckpoint
 from yaimpl.utils import parse_n_cpu
