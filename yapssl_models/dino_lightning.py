@@ -92,7 +92,7 @@ class DINO(pl.LightningModule):
         update_momentum(self.student_backbone, self.teacher_backbone, m=momentum)
         update_momentum(self.student_head, self.teacher_head, m=momentum)
         print(batch) # for debugging purposes TODO remove
-        print(batch[0].shape) # for debugging purposes TODO remove
+        print(len(batch[0])) # for debugging purposes TODO remove
         views, _ = batch
         views = [view.to(self.device) for view in views]
         global_views = views[:2]
