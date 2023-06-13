@@ -27,15 +27,15 @@ class PatchFeatureExtractor(nn.Module):
         #     extraction_model.eval()
 
         if self.ssl_arch == 'simclr':
-            extraction_model = simclr.SimCLRLightning.load_from_checkpoint(chkpt_fpath)
+            extraction_model = simclr.SimCLR.load_from_checkpoint(chkpt_fpath)
             extraction_model.eval()
 
         if self.ssl_arch == 'mae':
-            extraction_model = mae.MAELightning.load_from_checkpoint(chkpt_fpath)
+            extraction_model = mae.MAE.load_from_checkpoint(chkpt_fpath)
             extraction_model.eval()
 
         if self.ssl_arch == 'dino':
-            extraction_model = dino.DINOLightning.load_from_checkpoint(chkpt_fpath)
+            extraction_model = dino.DINO.load_from_checkpoint(chkpt_fpath)
             extraction_model.eval()
 
         self.chkpt = extraction_model
