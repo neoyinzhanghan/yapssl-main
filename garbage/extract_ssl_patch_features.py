@@ -30,7 +30,7 @@ from yatt.level_info import get_level_info_df
 from yatt.wsi_extensions import find_wsi_paths
 from yatt.RuntimeTracker import RuntimeTracker
 
-from ssl_eval import PatchFeatureExtractor
+from yapssl_models.ssl_eval import PatchFeatureExtractor
 
 # Make sure to install timm 0.4.12 if using MAE feature extractor
 ### pip install timm==0.4.12 ###
@@ -70,7 +70,7 @@ group.add_argument('--patch_size', default=224, type=int,
 group.add_argument('--mpp', default=0.57142857142, type=float,
                    help='Microns per pixel resolution for the image patches. The default of 0.5 is about 20x (200x effective) magnification.')
 
-group.add_argument('--min_tissue_area', default=1000, type=float,
+group.add_argument('--min_tissue_area', default=10000, type=float,
                    help='Only include patches with at least this much tissue in microns squared.')
 
 
