@@ -88,10 +88,10 @@ group = parser.add_argument_group('Bureaucracy')
 group.add_argument('--device', default='auto', type=str,
                    help='Which device to use.')
 
-group.add_argument('--num_workers', default=0, type=int,
-                   help='Number of workders for the data loader.')
+group.add_argument('--num_workers', default=32, type=int,
+                   help='Number of workers for the data loader.')
 
-group.add_argument('--batch_size', default=16, type=int,
+group.add_argument('--batch_size', default=64, type=int,
                    help='Batch size to use.')
 
 args = parser.parse_args()
@@ -230,8 +230,6 @@ for wsi_fpath in tqdm(avail_wsi_fpaths, desc="WSI patch feature extraction"):
                                      model=model,
                                      feature_saver=feature_saver,
                                      batch_size=args.batch_size,
-                                     max_batch_size=128,
                                      loader_kws={'num_workers': args.num_workers},
-                                     adjust_batch_size=True,
                                      device=device,
                                      verbosity=1)
