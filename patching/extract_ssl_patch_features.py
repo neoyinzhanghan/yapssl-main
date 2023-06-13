@@ -220,11 +220,12 @@ for wsi_fpath in tqdm(avail_wsi_fpaths, desc="WSI patch feature extraction"):
     #############################
     # Extract and save features #
     #############################
-    feature_saver = H5FeatureSaver(patch_identif=patch_df.index.values,
-                                   identif_name='patch_idx')
-
     feats_fpath = os.path.join(dirs['feats'], '{}.h5'.format(wsi_name))
 
+    feature_saver = H5FeatureSaver(patch_identif=patch_df.index.values,
+                                   identif_name='patch_idx',
+                                   fpath=feats_fpath,)
+    
     batch_size = save_patch_features(patches_dataset=dataset,
                                      model=model,
                                      fpath=feats_fpath,
