@@ -228,7 +228,6 @@ for wsi_fpath in tqdm(avail_wsi_fpaths, desc="WSI patch feature extraction"):
     
     batch_size = save_patch_features(patches_dataset=dataset,
                                      model=model,
-                                     fpath=feats_fpath,
                                      feature_saver=feature_saver,
                                      batch_size=args.batch_size,
                                      max_batch_size=128,
