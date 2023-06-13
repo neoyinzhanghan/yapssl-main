@@ -46,7 +46,7 @@ group.add_argument('--blr', default=0.0005, type=float,
                     help='this base learning rate is used to compute the actual learning rate')
 group.add_argument('--max_num_batches', default=None, type=int,
                     help='the maximum number of batches per epoch')
-group.add_argument('--weight_decay', default=0.05, type=float,
+group.add_argument('--weight_decay', default=(0.04 + 0.4)/2, type=float,
                     help='In deep learning, weight decay is a regularization technique used to prevent overfitting by adding a penalty to the loss function, which effectively reduces the magnitude of the weights in the model.')
 group.add_argument('--warm_up_epochs', default=40, type=int,
                     help='the number of epochs for a linear training warm-up')
@@ -131,7 +131,8 @@ if __name__ == '__main__':
                  epochs=args.epochs, 
                  niter_per_ep=len(train_loader), 
                  batch_size=args.batch_size,
-                 sub_patch_size=args.sub_patch_size)
+                 sub_patch_size=args.sub_patch_size,
+                 weight_decay=args.weight_decay)
 
     # CHECKPOINT CALLBACK SETTING
     checkpoint_callback = ModelCheckpoint(save_top_k=args.top_k_epochs, monitor='val_loss', mode='min')

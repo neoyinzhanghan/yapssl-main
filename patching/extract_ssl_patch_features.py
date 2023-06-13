@@ -97,6 +97,9 @@ group.add_argument('--batch_size', default=1, type=int,
 group.add_argument('--verbosity', default=1, type=int,
                    help='Verbosity level.')
 
+group.add_argument('--continue_on_error', type=bool, default=False,
+                   help='Continue processing even if there is an error.')
+
 args = parser.parse_args()
 
 
@@ -155,84 +158,95 @@ print("Found {} WSIs".format(len(avail_wsi_fpaths)))
 
 
 for wsi_fpath in tqdm(avail_wsi_fpaths, desc="WSI patch feature extraction"):
-    # wsi_fpath = avail_wsi_fpaths[0]
 
-    wsi_name = Path(wsi_fpath).stem
+    try:
+        # wsi_fpath = avail_wsi_fpaths[0]
 
-    ######################
-    # Create patch grid #
-    #####################
-    wsi = open_slide(wsi_fpath)
+        wsi_name = Path(wsi_fpath).stem
 
-    patcher = MaskAndPatch(mpp4mask=10,
-                           tissue_masker=RgbTissueMasker(),
-                           mpp4patch=args.mpp4patch,
-                           patch_size=patch_size,
-                           store_mask=True
-                           )
-    patcher.fit_mask_and_patch_grid(wsi)
-    patch_df = patcher.get_patch_df()
+        ######################
+        # Create patch grid #
+        #####################
+        wsi = open_slide(wsi_fpath)
 
-    # Only include patches with enough tissue
-    idxs_tissue = patch_df.query("tissue_area >= @min_tissue_area").index.values
-    patch_df['include'] = False
-    patch_df.loc[idxs_tissue, 'include'] = True
+        patcher = MaskAndPatch(mpp4mask=10,
+                            tissue_masker=RgbTissueMasker(),
+                            mpp4patch=args.mpp4patch,
+                            patch_size=patch_size,
+                            store_mask=True
+                            )
+        patcher.fit_mask_and_patch_grid(wsi)
+        patch_df = patcher.get_patch_df()
 
-    print("{}/{} patches ({:1.2f}%) have at least {} microns^2 tissue area".
-          format(len(idxs_tissue),
-                 patch_df.shape[0],
-                 100*len(idxs_tissue)/patch_df.shape[0],
-                 args.min_tissue_area))
+        # Only include patches with enough tissue
+        idxs_tissue = patch_df.query("tissue_area >= @min_tissue_area").index.values
+        patch_df['include'] = False
+        patch_df.loc[idxs_tissue, 'include'] = True
 
-    ###################
-    # Save patch info #
-    ###################
-    if save_patch_grid:
+        print("{}/{} patches ({:1.2f}%) have at least {} microns^2 tissue area".
+            format(len(idxs_tissue),
+                    patch_df.shape[0],
+                    100*len(idxs_tissue)/patch_df.shape[0],
+                    args.min_tissue_area))
 
-        # Visualize mask + patch grid
-        plt.figure(figsize=(20, 10))
-        patcher.plot_mask_and_grid(min_tissue_area=args.min_tissue_area, thickness=2)
-        savefig(os.path.join(dirs['patch_viz'], '{}.png'.format(wsi_name)))
+        ###################
+        # Save patch info #
+        ###################
+        if save_patch_grid:
 
-        # save patch information
-        patch_data = {'patch_df': patch_df,
-                      'mpp': args.mpp4patch,
-                      'mpp_level0': get_level_info_df(wsi).loc[0, 'mpp'],
-                      'patch_size': patch_size
-                      }
+            # Visualize mask + patch grid
+            plt.figure(figsize=(20, 10))
+            patcher.plot_mask_and_grid(min_tissue_area=args.min_tissue_area, thickness=2)
+            savefig(os.path.join(dirs['patch_viz'], '{}.png'.format(wsi_name)))
 
-        dump(patch_data, os.path.join(dirs['patch_info'], wsi_name))
+            # save patch information
+            patch_data = {'patch_df': patch_df,
+                        'mpp': args.mpp4patch,
+                        'mpp_level0': get_level_info_df(wsi).loc[0, 'mpp'],
+                        'patch_size': patch_size
+                        }
 
-    # subset to only the patches we will include
-    patch_df = patch_df.query('include')
-    if args.max_n_patches is not None:
-        patch_df = patch_df.iloc[0:args.max_n_patches]
+            dump(patch_data, os.path.join(dirs['patch_info'], wsi_name))
 
-    #########################
-    # Setup patches dataset #
-    #########################
+        # subset to only the patches we will include
+        patch_df = patch_df.query('include')
+        if args.max_n_patches is not None:
+            patch_df = patch_df.iloc[0:args.max_n_patches]
 
-    coords_level0 = patch_df[['x', 'y']].values
-    dataset = WsiPatchesDataset(wsi_fpath=wsi_fpath,
-                                coords_level0=coords_level0,
-                                patch_size=patch_size,
-                                mpp=args.mpp4patch,
-                                transform=ToTensor())
+        #########################
+        # Setup patches dataset #
+        #########################
+
+        coords_level0 = patch_df[['x', 'y']].values
+        dataset = WsiPatchesDataset(wsi_fpath=wsi_fpath,
+                                    coords_level0=coords_level0,
+                                    patch_size=patch_size,
+                                    mpp=args.mpp4patch,
+                                    transform=ToTensor())
 
 
-    #############################
-    # Extract and save features #
-    #############################
-    feats_fpath = os.path.join(dirs['feats'], '{}.h5'.format(wsi_name))
+        #############################
+        # Extract and save features #
+        #############################
+        feats_fpath = os.path.join(dirs['feats'], '{}.h5'.format(wsi_name))
 
-    feature_saver = H5FeatureSaver(patch_identif=patch_df.index.values,
-                                   identif_name='patch_idx',
-                                   fpath=feats_fpath,)
+        feature_saver = H5FeatureSaver(patch_identif=patch_df.index.values,
+                                    identif_name='patch_idx',
+                                    fpath=feats_fpath,)
+        
+        batch_size = save_patch_features(patches_dataset=dataset,
+                                        model=model,
+                                        feature_saver=feature_saver,
+                                        batch_size=args.batch_size,
+                                        loader_kws={'num_workers': args.num_workers},
+                                        device=device,
+                                        verbosity=args.verbosity)
+    except Exception as e:
+        print("Error with {}".format(wsi_fpath))
+        print(e)
+        if args.continue_on_error:
+            continue 
     
-    batch_size = save_patch_features(patches_dataset=dataset,
-                                     model=model,
-                                     feature_saver=feature_saver,
-                                     batch_size=args.batch_size,
-                                     loader_kws={'num_workers': args.num_workers},
-                                     device=device,
-                                     verbosity=args.verbosity)
+    except KeyboardInterrupt:
+        print("Keyboard interrupt")
+        break
