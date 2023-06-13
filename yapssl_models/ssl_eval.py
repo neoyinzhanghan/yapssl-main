@@ -33,7 +33,8 @@ class PatchFeatureExtractor(nn.Module):
         if self.ssl_arch == 'mae':
             extraction_model = mae.MAELightning.load_from_checkpoint(chkpt_fpath)
             extraction_model.eval()
-        if self.ssl_arch == 'dino'
+
+        if self.ssl_arch == 'dino':
             extraction_model = dino.DINOLightning.load_from_checkpoint(chkpt_fpath)
             extraction_model.eval()
 

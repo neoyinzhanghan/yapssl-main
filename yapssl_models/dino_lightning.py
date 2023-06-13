@@ -33,6 +33,7 @@ class DINO(pl.LightningModule):
         
         super().__init__()
 
+        self.ssl_arch = 'dino'
         # this is if you want to use resnet18 backbone
         # resnet = torchvision.models.resnet18()
         # backbone = nn.Sequential(*list(resnet.children())[:-1])
@@ -42,7 +43,7 @@ class DINO(pl.LightningModule):
         # original paper (you might have to reduce the batch size in this case):
         backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits16', pretrained=False)
         input_dim = backbone.embed_dim
-
+        
         self.student_backbone = backbone
         self.student_head = DINOProjectionHead(
             input_dim, 512, 64, 2048, freeze_last_layer=1

@@ -9,6 +9,8 @@ from lightly.models.modules import masked_autoencoder
 from torchmetrics import MetricCollection
 
 from yapssl_utils.warm_up_epochs import WarmUpLR
+    
+
 
 class MAE(pl.LightningModule):
     def __init__(self, 
@@ -24,6 +26,7 @@ class MAE(pl.LightningModule):
         
         super().__init__()
 
+        self.ssl_arch = 'mae'
         self.decoder_dim = decoder_dim
         vit = torchvision.models.vit_b_32(pretrained=False)
         self.mask_ratio = mask_ratio

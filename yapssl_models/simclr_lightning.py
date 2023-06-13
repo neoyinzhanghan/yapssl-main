@@ -15,6 +15,8 @@ class SimCLR(pl.LightningModule):
     def __init__(self, lr, warm_up_epochs, total_epochs, weight_decay, batch_size):
 
         super().__init__()
+
+        self.ssl_arch = 'simclr'
         resnet = torchvision.models.resnet50()
         self.backbone = nn.Sequential(*list(resnet.children())[:-1])
         self.projection_head = SimCLRProjectionHead(2048, 2048, 2048)
