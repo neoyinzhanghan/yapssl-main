@@ -88,10 +88,10 @@ group = parser.add_argument_group('Bureaucracy')
 group.add_argument('--device', default='auto', type=str,
                    help='Which device to use.')
 
-group.add_argument('--num_workers', default=32, type=int,
+group.add_argument('--num_workers', default=1, type=int,
                    help='Number of workers for the data loader.')
 
-group.add_argument('--batch_size', default=64, type=int,
+group.add_argument('--batch_size', default=1, type=int,
                    help='Batch size to use.')
 
 group.add_argument('--verbosity', default=1, type=int,
