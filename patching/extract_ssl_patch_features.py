@@ -94,13 +94,6 @@ group.add_argument('--num_workers', default=0, type=int,
 group.add_argument('--batch_size', default=16, type=int,
                    help='Batch size to use.')
 
-####################################
-group = parser.add_argument_group('Limit number of WSIs')
-####################################
-
-group.add_argument('--max_n_wsi', default=None, type=int,
-                   help='Maximum number of WSIs. Useful for prototyping/debugging.')
-
 args = parser.parse_args()
 
 
