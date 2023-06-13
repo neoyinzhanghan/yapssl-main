@@ -94,6 +94,9 @@ group.add_argument('--num_workers', default=32, type=int,
 group.add_argument('--batch_size', default=64, type=int,
                    help='Batch size to use.')
 
+group.add_argument('--verbosity', default=1, type=int,
+                   help='Verbosity level.')
+
 args = parser.parse_args()
 
 
@@ -232,4 +235,4 @@ for wsi_fpath in tqdm(avail_wsi_fpaths, desc="WSI patch feature extraction"):
                                      batch_size=args.batch_size,
                                      loader_kws={'num_workers': args.num_workers},
                                      device=device,
-                                     verbosity=1)
+                                     verbosity=args.verbosity)
