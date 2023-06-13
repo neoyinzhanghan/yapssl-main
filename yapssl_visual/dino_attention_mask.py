@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser('Visualize Self-Attention maps')
 
-    parser.add_argument('--sub_patch_size', default=8, type=int, help='Patch resolution of the model.')
+    parser.add_argument('--sub_patch_size', default=16, type=int, help='Patch resolution of the model.')
     parser.add_argument('--pretrained_weights', default='', type=str,
         help="Path to pretrained weights to load.")
     parser.add_argument("--checkpoint_key", default="teacher", type=str,

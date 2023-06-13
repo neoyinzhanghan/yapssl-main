@@ -24,7 +24,7 @@ class DINO(pl.LightningModule):
                  niter_per_ep,
                  batch_size,
                  lr_warm_up_epochs = 10,
-                 sub_patch_size = 8,
+                 sub_patch_size = 16,
                  temp_student = 0.1,
                  temp_teacher_start = 0.04, # cosine schedule from 0.04 to 0.07 over the first 30 epochs
                  temp_teacher_end = 0.07,
@@ -43,12 +43,10 @@ class DINO(pl.LightningModule):
         # original paper (you might have to reduce the batch size in this case):
 
         # raise an error if the sub_patch_size is not 8 or 16
-        if sub_patch_size not in [8, 16]:
-            raise ValueError("Sub_patch_size must be either 8 or 16!")
+        if sub_patch_size != 16:
+            raise ValueError("Sub_patch_size must be 16!")
 
-        if sub_patch_size == 8:
-            backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits8', pretrained=False)
-        elif sub_patch_size == 16:
+        if sub_patch_size == 16:
             backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits16', pretrained=False)
         input_dim = backbone.embed_dim
         
