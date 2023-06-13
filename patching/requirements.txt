@@ -1,15 +1,24 @@
 h5py==3.8.0
-matplotlib==3.6.2
+huggingface-hub @ file:///home/conda/feedstock_root/build_artifacts/huggingface_hub_1685724038553/work
+lightly==1.4.6
+lightly-utils==0.0.2
+lightning-utilities @ file:///croot/lightning-utilities_1677510309509/work
+matplotlib @ file:///croot/matplotlib-suite_1679593461707/work
 more-itertools==9.1.0
-numpy==1.23.5
+numpy @ file:///croot/numpy_and_numpy_base_1682520569166/work
 opencv-python==4.7.0.72
 openslide-python==1.2.0
 pandas==1.5.3
 Pillow==9.4.0
-scikit-image==0.20.0
+pytorch-lightning==1.9.3
+scikit-image==0.21.0
 scikit-learn==1.2.2
-scipy==1.9.1
-torch==1.12.1
-torchvision==0.13.1
+scipy==1.10.1
+tensorboardX==2.6
+timm==0.6.13
+torch==2.0.1
+torchaudio==2.0.2
+torchmetrics==0.11.2
+torchvision==0.15.2
 tqdm==4.65.0
 urllib3==1.26.15
