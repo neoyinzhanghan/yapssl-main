@@ -36,7 +36,7 @@ group.add_argument('--data_path', type=str,
 group = parser.add_argument_group('Training Hyperparameters')
 ####################################
 
-group.add_argument('--batch_size', default=64, type=int, #1024 is the paper default inner_eff_batch_size
+group.add_argument('--batch_size', default=128, type=int, #1024 is the paper default inner_eff_batch_size
                     help='Batch size for training')
 group.add_argument('--test_batch_size', default=64, type=int,
                     help='Batch size for testing')
@@ -50,7 +50,7 @@ group.add_argument('--weight_decay', default=(0.04 + 0.4)/2, type=float,
                     help='In deep learning, weight decay is a regularization technique used to prevent overfitting by adding a penalty to the loss function, which effectively reduces the magnitude of the weights in the model.')
 group.add_argument('--warm_up_epochs', default=40, type=int,
                     help='the number of epochs for a linear training warm-up')
-group.add_argument('--accum_grad', default=32, type=int,
+group.add_argument('--accum_grad', default=16, type=int,
                     help='accumulate gradients for accum_grad batches')
 group.add_argument('--min_lr', type=float, default=1e-6, 
                    help="Target LR at the end of optimization. We use a cosine LR schedule with linear warmup.")
