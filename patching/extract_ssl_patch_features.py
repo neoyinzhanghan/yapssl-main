@@ -22,7 +22,7 @@ from yatt.viz import savefig
 from yatt.level_info import get_level_info_df
 from yatt.wsi_extensions import find_wsi_paths
 
-from ssl_eval import PatchFeatureExtractor
+from yapssl_models.ssl_eval import PatchFeatureExtractor
 
 # Make sure to install timm 0.4.12 if using MAE feature extractor
 ### pip install timm==0.4.12 ###
