@@ -37,7 +37,7 @@ model = MAE.load_from_checkpoint(model_path, lr=0, batch_size=1)
 from torchvision.utils import make_grid
 from PIL import Image
 
-def tensor_to_img(patches: torch.Tensor) -> PIL.Image:
+def tensor_to_img(patches: torch.Tensor):
     """
     Converts a batch of image patches from a tensor to a PIL image.
 
