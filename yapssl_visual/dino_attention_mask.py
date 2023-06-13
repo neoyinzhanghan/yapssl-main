@@ -22,30 +22,8 @@ from yapssl_models.dino_lightning import DINO
 
 
 ####################################################################################################
-# ARGUMENT PARSING
-####################################################################################################
-
-parser = argparse.ArgumentParser('Visualize Self-Attention maps')
-
-parser.add_argument('--sub_patch_size', default=8, type=int, help='Patch resolution of the model.')
-parser.add_argument('--pretrained_weights', default='', type=str,
-    help="Path to pretrained weights to load.")
-parser.add_argument("--checkpoint_key", default="teacher", type=str,
-    help='Key to use in the checkpoint (example: "teacher")')
-parser.add_argument("--image_path", default=None, type=str, help="Path of the image to load.")
-parser.add_argument("--image_size", default=(224, 224), type=int, nargs="+", help="Resize image.")
-parser.add_argument('--output_dir', default='.', help='Path where to save visualizations.')
-parser.add_argument("--threshold", type=float, default=None, help="""We visualize masks
-    obtained by thresholding the self-attention maps to keep xx% of the mass.""")
-args = parser.parse_args()
-
-
-
-
-####################################################################################################
 # THE FUNCTIONS                                                                                     
 ####################################################################################################
-
 
 def apply_mask(image, mask, color, alpha=0.5):
     for c in range(3):
@@ -111,6 +89,28 @@ def display_instances(image, mask, fname="test", figsize=(5, 5), blur=False, con
 ####################################################################################################
 
 if __name__ == '__main__':
+
+    ####################################################################################################
+    # ARGUMENT PARSING
+    ####################################################################################################
+
+    parser = argparse.ArgumentParser('Visualize Self-Attention maps')
+
+    parser.add_argument('--sub_patch_size', default=8, type=int, help='Patch resolution of the model.')
+    parser.add_argument('--pretrained_weights', default='', type=str,
+        help="Path to pretrained weights to load.")
+    parser.add_argument("--checkpoint_key", default="teacher", type=str,
+        help='Key to use in the checkpoint (example: "teacher")')
+    parser.add_argument("--image_path", default=None, type=str, help="Path of the image to load.")
+    parser.add_argument("--image_size", default=(224, 224), type=int, nargs="+", help="Resize image.")
+    parser.add_argument('--output_dir', default='.', help='Path where to save visualizations.')
+    parser.add_argument("--threshold", type=float, default=None, help="""We visualize masks
+        obtained by thresholding the self-attention maps to keep xx% of the mass.""")
+    args = parser.parse_args()
+
+    # if output_dir does not exist, create it
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
 
     device = 'cpu'
     # Get the ViT backbone model

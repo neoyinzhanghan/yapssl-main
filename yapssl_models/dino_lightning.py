@@ -41,7 +41,15 @@ class DINO(pl.LightningModule):
 
         # instead of a resnet you can also use a vision transformer backbone as in the
         # original paper (you might have to reduce the batch size in this case):
-        backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits16', pretrained=False)
+
+        # raise an error if the sub_patch_size is not 8 or 16
+        if sub_patch_size not in [8, 16]:
+            raise ValueError("Sub_patch_size must be either 8 or 16!")
+
+        if sub_patch_size == 8:
+            backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits8', pretrained=False)
+        elif sub_patch_size == 16:
+            backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits16', pretrained=False)
         input_dim = backbone.embed_dim
         
         self.student_backbone = backbone
