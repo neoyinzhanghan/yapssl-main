@@ -73,16 +73,13 @@ if __name__ == '__main__':
                                         min_tissue_area=args.min_tissue_area,
                                         max_num_patches_per_wsi=args.max_num_patches_per_wsi,
                                         tag=' --- ' + str(i + 1) + '/' + str(args.n_wsis))
-
-            except Exception:
-                print('Some WSI error occurred, continuing with new WSI')
-                pass
-
             except ValueError:
                 print(
                     f'A value error occurred. Most likely cause is that your specified file extention {args.patch_ext} is not supported. Supported file extension include .png and .pt')
                 break
-
+            except Exception:
+                print('Some WSI error occurred, continuing with new WSI')
+                pass
             except KeyboardInterrupt:
                 print('Interrupted by user.')
                 break
@@ -115,16 +112,13 @@ if __name__ == '__main__':
                                         tag=' --- ' + str(i + 1) + '/' + str(args.n_wsis))
                     i += 1
 
-
-            except Exception:
-                print('Some WSI error occurred, continuing with new WSI')
-                pass
-
             except ValueError:
                 print(
                     f'A value error occurred. Most likely cause is that your specified file extention {args.patch_ext} is not supported. Supported file extension include .png and .pt')
                 break
-
+            except Exception:
+                print('Some WSI error occurred, continuing with new WSI')
+                pass
             except KeyboardInterrupt:
                 print('Interrupted by user.')
                 break
