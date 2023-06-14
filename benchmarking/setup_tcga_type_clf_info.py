@@ -17,7 +17,7 @@ parser.add_argument('--save_dir', type=str,
 parser.add_argument('--wsi_dirs', type=str, nargs='+',
                     help='Directories containing the whole slide images or whole slide image features.')
 
-parser.add_argument('--cdr_fpath', type=str,
+parser.add_argument('--cdr_fpath', type=str, default='yapssl_resources/TCGA/mmc1.xlsx',
                     help='Path to TCGA clean data resource i.e. mmc1.xlsx file.')
 
 parser.add_argument('--label_col', type=str, default='type',
