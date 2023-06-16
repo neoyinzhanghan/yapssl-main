@@ -1,3 +1,13 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+.DS_Store
+.idea
+.vscode
+benchmarking/__pycache__
+patching/__pycache__
+training/__pycache__
+yapssl_data/__pycache__
+__pycache__
+.egg-info
+yapssl_models/__pycache__
+yapssl_resources/__pycache__
+yapssl_utils/__pycache__
+yapssl_visual/__pycache__
